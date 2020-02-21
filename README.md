@@ -1,2 +1,2 @@
 # peel-1
-peel-1 selection
+Analysis scripts for peel-1-DMS selection
