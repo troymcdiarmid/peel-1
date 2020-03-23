@@ -163,7 +163,7 @@ screen_time_integrant_data_53 <- screen_time_integrant_data %>%
   filter(Injector_gene %in% c("T_F53B6.7", "V_F53B6.7")) 
 
 res<-wilcox.test(Screening_time ~ Treatment, data=screen_time_integrant_data_53)
-res
+res 
 
 ##Statistical test of effect of peel on screening time for F10E9.2
 
@@ -400,15 +400,14 @@ cleanrawsmorph <- rawsmorph %>%
   separate(plate_id, into = c("garbage", "plate_id", "genotype"), sep ="/") %>%
   separate(genotype, into = c("genotype", "time"), sep = ":") %>% separate(genotype, into = c("genotype", "synch_conditions", "growth_conditions"), sep = "_") 
 
+#Recoding to combine data from standard egg lay and bleach synched K04F10.3 animals into one group as they showed similar results. 
+
+cleanrawsmorph$genotype <- recode(cleanrawsmorph$genotype, `K04F10B` = "K04F10S")
+
 ####Make time numeric and round time
 
 cleanrawsmorph <- cleanrawsmorph %>% mutate(time = as.numeric(time)) %>% 
   mutate(time = round(time, digits = 0)) 
-
-#Filtering to removing bleach synched K04F10.3 animals as they showed similar results as the egg laying synchornizatin prepared K04F10.3 animals and for consistency becuase the controls were prepared by standard egg laying synchronization. 
-
-cleanrawsmorph <- cleanrawsmorph %>% 
-  filter(genotype %in% c("PD1074", "pbs1", "K04F10S"))
 
 ##Ordering the genotype factor for plotting
     
@@ -469,6 +468,8 @@ ggplot(mean_cleanrawsmorph, aes(genotype, length, fill = genotype)) +
   theme(axis.title.x = element_text(family="Arial", colour = "black", size = 0)) +
 ggsave("length.jpeg", width = 1.7, height = 2.3, path = "/Users/troymcdiarmid/Desktop/")
 
+summary(lm(length~genotype, mean_cleanrawsmorph))
+
 ##Plot of Width
 
 ggplot(mean_cleanrawsmorph, aes(genotype, width, fill = genotype)) +
@@ -492,6 +493,8 @@ ggplot(mean_cleanrawsmorph, aes(genotype, width, fill = genotype)) +
   theme(axis.title.y = element_text(family="Arial", colour = "black", size = 8)) +
   theme(axis.title.x = element_text(family="Arial", colour = "black", size = 0)) +
 ggsave("width.jpeg", width = 1.7, height = 2.3, path = "/Users/troymcdiarmid/Desktop/")
+
+summary(lm(width~genotype, mean_cleanrawsmorph))
 
 ##Plot of Curve
 
@@ -517,6 +520,7 @@ ggplot(mean_cleanrawsmorph, aes(genotype, kink, fill = genotype)) +
   theme(axis.title.x = element_text(family="Arial", colour = "black", size = 0)) +
 ggsave("kink.jpeg", width = 1.7, height = 2.3, path = "/Users/troymcdiarmid/Desktop/")
 
+summary(lm(kink~genotype, mean_cleanrawsmorph))
 
 ```
 
@@ -596,6 +600,8 @@ ggplot(mean_cleanrawsmorph_posthab, aes(genotype, speed, fill = genotype)) +
   theme(axis.title.x = element_text(family="Arial", colour = "black", size = 0)) +
 ggsave("speed.jpeg", width = 1.7, height = 2.3, path = "/Users/troymcdiarmid/Desktop/")
 
+summary(lm(speed~genotype, mean_cleanrawsmorph_posthab))
+
 ```
 
 
@@ -631,10 +637,9 @@ cleanrawsrev <- cleanrawsrev %>%
 cleanrawsrev <- cleanrawsrev %>% mutate(time = as.numeric(time)) %>% 
   mutate(time = round(time, digits = 0)) 
 
-#Filtering to removing bleach synched K04F10.3 animals as they showed similar results as the egg laying synchornizatin prepared K04F10.3 animals and for consistency becuase the controls were prepared by standard egg laying synchronization. 
+#Recoding to combine data from standard egg lay and bleach synched K04F10.3 animals into one group as they showed similar results. 
 
-cleanrawsrev <- cleanrawsrev %>% 
-  filter(genotype %in% c("PD1074", "pbs1", "K04F10S"))
+cleanrawsrev$genotype <- recode(cleanrawsrev$genotype, `K04F10B` = "K04F10S")
 
 ##Ordering the genotype factor for plotting
     
@@ -652,6 +657,7 @@ cleanrawsrev <- cleanrawsrev %>%
   filter(!(rev_dist == "0")) 
 cleanrawsrev <- cleanrawsrev %>% 
   filter(!(time == "659")) 
+
 
 ##Calculate reversal speed 
 
@@ -765,7 +771,7 @@ ggplot(mean_cleanrawsrev_filt, aes(stimulus_num, rev_speed, colour = genotype)) 
   geom_line(size = 0.4) + 
   geom_errorbar(aes(ymin=rev_speed-speed_SEM_filt$speed_sem, ymax=rev_speed+speed_SEM_filt$speed_sem), width = 0, size = 0.4) +
   scale_y_continuous(expand = c(0,0),
-                     limits = c(0,0.4), breaks = c(0,0.1,0.2,0.3,0.4)) +
+                     limits = c(0,0.5), breaks = c(0,0.1,0.2,0.3,0.4,0.5)) +
   scale_x_continuous(expand = c(0,0),
                      limits = c(0,32), breaks = c(0,31)) +
   geom_point(size = 0.8) +
@@ -779,6 +785,31 @@ ggplot(mean_cleanrawsrev_filt, aes(stimulus_num, rev_speed, colour = genotype)) 
   theme(axis.title.y = element_text(family="Arial", colour = "black", size = 8)) +
   theme(legend.position="none") +
   ggsave("PD1074_vs_pbs1_vs_K04F103_speed.jpeg", width = 2.3, height = 2.2, path = "/Users/troymcdiarmid/Desktop/")
+
+Final_rev_prob <- cleanrawsrev %>%
+  group_by(genotype, plate_id) %>%
+  filter(time %in% c(870:890)) %>% 
+  summarize(final_rev_prob = mean(rev_prob))
+
+summary(lm(final_rev_prob~genotype, Final_rev_prob))
+
+Final_rev_dur <- cleanrawsrev %>%
+  group_by(genotype, plate_id) %>%
+  filter(time %in% c(870:890)) %>% 
+  summarize(final_rev_dur = mean(rev_dur))
+
+summary(lm(final_rev_dur~genotype, Final_rev_dur))
+
+Final_rev_speed <- cleanrawsrev %>%
+  group_by(genotype, plate_id) %>%
+  filter(time %in% c(870:890)) %>% 
+  summarize(final_rev_speed = mean(rev_speed))
+
+summary(lm(final_rev_speed~genotype, Final_rev_speed))
+
+
+summary(aov(final_rev_prob~genotype, Final_rev_prob))
+
   
 ```
 
