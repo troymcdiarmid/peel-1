@@ -765,7 +765,7 @@ ggplot(mean_cleanrawsrev_filt, aes(stimulus_num, rev_speed, colour = genotype)) 
   geom_line(size = 0.4) + 
   geom_errorbar(aes(ymin=rev_speed-speed_SEM_filt$speed_sem, ymax=rev_speed+speed_SEM_filt$speed_sem), width = 0, size = 0.4) +
   scale_y_continuous(expand = c(0,0),
-                     limits = c(0,0.4), breaks = c(0,0.1,0.2,0.3)) +
+                     limits = c(0,0.4), breaks = c(0,0.1,0.2,0.3,0.4)) +
   scale_x_continuous(expand = c(0,0),
                      limits = c(0,32), breaks = c(0,31)) +
   geom_point(size = 0.8) +
