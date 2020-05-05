@@ -8,6 +8,7 @@ output: html_document
 
 library(tidyverse)
 library(scales)
+library(broom)
 
 ```
 
@@ -104,74 +105,7 @@ theme_classic() +
   theme(axis.title.y.right = element_text(family="Arial", colour = "black", size = 8, angle = 90)) +
   theme(axis.title.x = element_text(family="Arial", colour = "black", size = 0)) +
   scale_fill_manual(values = c("black", "dodgerblue2")) +
-ggsave("enrich.jpeg", width = 1.5, height = 2.8, path = "/Users/troymcdiarmid/Desktop/")
-
-```
-
-
-```{r}
-##Making a plot of the screening time taken to find integrants under each condition. 
-
-##Loading in plate screening time data
-
-setwd("/Users/troymcdiarmid/Documents/Peel_materials/")
-
-screen_time_data <- read_csv("/Users/troymcdiarmid/Documents/Peel_materials/Peel_screen_times.csv", col_names = TRUE)
-
-##Create "Injector_gene" compound variable. 
-
-screen_time_data <- screen_time_data %>% 
-  unite(Injector_gene, Injector, Gene)
-
-##Remove plates that took 5 mins to screen as no integrant was found in the 5 minute screening period. 
-
-screen_time_integrant_data <- screen_time_data %>% 
-  filter(!Screening_time == 300)
-
-##Make a violin/boxplot of screening times
-
-screen_time_integrant_data$Injector_gene <- factor(screen_time_integrant_data$Injector_gene,
-    levels = c('T_F10E9.2', 'V_F10E9.2', 'T_F53B6.7', 'V_F53B6.7'), ordered = TRUE)
-
-ggplot(screen_time_integrant_data, aes(x = Injector_gene, y = Screening_time, fill = Treatment)) + 
-  geom_violin(position = position_dodge(width = 0.65), trim = FALSE, size = 0.4) +
-  geom_point(position = position_jitterdodge(jitter.width = 0, jitter.height = 0.05,
-  dodge.width = 0.65, seed = 3), size = 0.3) +
-  scale_fill_manual(values = c("white", "dodgerblue2")) +
-   scale_y_log10("Screening time (S)",
-        breaks = trans_breaks("log10", function(x) 10^x),
-        labels = trans_format("log10", math_format(10^.x))) +
-  theme_classic() +
-  labs(y = "Screening time (S)", x = "") +
-  theme(legend.title= element_text(family="Arial Bold")) +
-  theme(legend.position = "none") +
-  theme(axis.line = element_line(colour = 'black', size = 0.4)) + 
-  theme(axis.line.x = element_line(size = 0)) +
-  theme(axis.ticks.y = element_line(colour = "black", size = 0.4)) +
-  theme(axis.ticks.length=unit(.03, "in")) +
-  theme(axis.ticks.x = element_line(size = 0)) +
-  theme(axis.text = element_text(family="Arial", colour = "black")) +
-  theme(axis.text.x = element_text(size = 0)) +
-  theme(axis.text.y = element_text(family="Arial", colour = "black", size = 8)) +
-  theme(axis.title.y = element_text(family="Arial", colour = "black", size = 8)) +
-  theme(axis.title.x = element_text(family="Arial", colour = "black", size = 0)) +
-ggsave("Screen_time.jpeg", width = 3.5, height = 1.5, path = "/Users/troymcdiarmid/Desktop/")
-
-##Statistical test of effect of peel on screening time for F53B6.7
-
-screen_time_integrant_data_53 <- screen_time_integrant_data %>% 
-  filter(Injector_gene %in% c("T_F53B6.7", "V_F53B6.7")) 
-
-res<-wilcox.test(Screening_time ~ Treatment, data=screen_time_integrant_data_53)
-res 
-
-##Statistical test of effect of peel on screening time for F10E9.2
-
-screen_time_integrant_data_10 <- screen_time_integrant_data %>% 
-  filter(Injector_gene %in% c("T_F10E9.2", "T_F10E9.2")) 
-
-res<-wilcox.test(Screening_time ~ Treatment, data=screen_time_integrant_data_10)
-res
+ggsave("enrich.jpeg", width = 1.47, height = 4.37, path = "/Users/troymcdiarmid/Desktop/")
 
 ```
 
@@ -431,7 +365,7 @@ cleanrawsmorph_baseline <- cleanrawsmorph %>%
 ##Code to calculate mean of morphology metrics
 
 mean_cleanrawsmorph <- cleanrawsmorph_baseline %>% 
-  select(genotype, plate_id, width:speed) 
+  dplyr::select(genotype, plate_id, width:speed) 
 
 mean_cleanrawsmorph <- mean_cleanrawsmorph %>%  
   group_by(genotype, plate_id) %>%
@@ -468,7 +402,11 @@ ggplot(mean_cleanrawsmorph, aes(genotype, length, fill = genotype)) +
   theme(axis.title.x = element_text(family="Arial", colour = "black", size = 0)) +
 ggsave("length.jpeg", width = 1.7, height = 2.3, path = "/Users/troymcdiarmid/Desktop/")
 
-summary(lm(length~genotype, mean_cleanrawsmorph))
+fit <- summary(lm(length~genotype, mean_cleanrawsmorph))
+
+t_fit <- tidy(fit)
+
+p.adjust(t_fit$p.value, "BH")
 
 ##Plot of Width
 
