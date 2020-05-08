@@ -19,7 +19,7 @@ library(broom)
 
 ##Read in starvation data 
 
-setwd("/Users/troymcdiarmid/Documents/Peel_materials/")
+setwd("/Users/troymcdiarmid/Documents/Peel_materials/peel_selection_data")
 
 starve_data <- read_csv("/Users/troymcdiarmid/Documents/Peel_materials/peel_plate_starve.csv", col_names = TRUE)
 
@@ -82,7 +82,7 @@ ggsave("F53_Peel_starve.jpeg", width = 1.5, height = 2.2, path = "/Users/troymcd
 
 ##Loading in integrant enrichment data
 
-setwd("/Users/troymcdiarmid/Documents/Peel_materials/")
+setwd("/Users/troymcdiarmid/Documents/Peel_materials/peel_selection_data")
 
 enrich_data <- read_csv("/Users/troymcdiarmid/Documents/Peel_materials/Peel_enriched_plate_counts.csv", col_names = TRUE)
 
@@ -112,7 +112,7 @@ ggsave("enrich.jpeg", width = 1.47, height = 4.37, path = "/Users/troymcdiarmid/
 ```{r}
 ##Making a plot of the proportion of plates where integrants were found
 
-setwd("/Users/troymcdiarmid/Documents/Peel_materials/")
+setwd("/Users/troymcdiarmid/Documents/Peel_materials/peel_selection_data")
 
 total_integrant_data <- read_csv("/Users/troymcdiarmid/Documents/Peel_materials/peel_screen_times.csv", col_names = TRUE)
 
@@ -194,9 +194,9 @@ ggsave("F10_integrant_proportion.jpeg", width = 1.5, height = 2.2, path = "/User
 ```{r}
 ##Making a plot of the effect of multiple heatshock rounds on days 5,7,9 on plate starvation 10 days post-injection
 
-setwd("/Users/troymcdiarmid/Documents/Peel_materials/")
+setwd("/Users/troymcdiarmid/Documents/Peel_materials/peel_selection_data")
 
-starve_data_pbs_k04_10_579 <- read_csv("/Users/troymcdiarmid/Documents/Peel_materials/peel_plate_starve_pbs_K04_multiday.csv", col_names = TRUE)
+starve_data_pbs_k04_10_579 <- read_csv("/Users/troymcdiarmid/Documents/Peel_materials/peel_selection_data/peel_plate_starve_pbs_K04_multiday.csv", col_names = TRUE)
 
 ## Plot for pbs-1
 
