@@ -402,11 +402,20 @@ ggplot(mean_cleanrawsmorph, aes(genotype, length, fill = genotype)) +
   theme(axis.title.x = element_text(family="Arial", colour = "black", size = 0)) +
 ggsave("length.jpeg", width = 1.7, height = 2.3, path = "/Users/troymcdiarmid/Desktop/")
 
+##Fit a linear model and estimate signficance of group differences with adjusted p-values. 
+
 fit <- summary(lm(length~genotype, mean_cleanrawsmorph))
 
-t_fit <- tidy(fit)
+tidy_fit <- tidy(fit) %>% 
+  filter(term %in% c("genotype.L", "genotype.Q")) 
 
-p.adjust(t_fit$p.value, "BH")
+tidy_fit$term <- recode(tidy_fit$term, `genotype.L` = "K04F10S", `genotype.Q` = "pbs1") 
+
+qvals <- p.adjust(tidy_fit$p.value, "BH")
+
+tidy_fit$q.vals <- qvals
+
+write_csv(tidy_fit, "/Users/troymcdiarmid/Documents/Analysis_scripts/peel-1/stats/length_stats.csv")
 
 ##Plot of Width
 
